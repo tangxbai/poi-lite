@@ -115,8 +115,9 @@ public final class ExcelWriter<T> extends ExcelProvider<ExcelWriter<T>, T> {
 			String filePath = target.getAbsolutePath() + File.separator + System.currentTimeMillis() + ".xlsx";
 			target = new File( filePath );
 		}
-		if ( !target.exists() ) {
-			target.createNewFile();
+		if ( !target.exists() && !target.createNewFile() ) {
+			log.error( "Unable to generate target file, please check if you have permission." );
+			return;
 		}
 		String filePath = target.getAbsolutePath();
 		String extension = StringUtils.substringAfterLast( filePath, "." );

@@ -21,6 +21,13 @@ import org.slf4j.LoggerFactory;
 import com.viiyue.plugins.excel.metadata.ExcelInfo;
 import com.viiyue.plugins.excel.metadata.MetadataParser;
 
+/**
+ * Excel abstract provider
+ * 
+ * @author tangxbai
+ * @email tangxbai@hotmail.com
+ * @since 2021/06/01
+ */
 abstract class ExcelProvider<K extends ExcelProvider<?, ?>, T> {
 
 	protected static final Logger log = LoggerFactory.getLogger( ExcelProvider.class );

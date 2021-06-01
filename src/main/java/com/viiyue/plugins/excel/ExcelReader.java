@@ -48,6 +48,7 @@ import com.viiyue.plugins.excel.metadata.ExcelInfo;
  */
 public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 
+	private static final int activeSheetIndex = -1;
 	private static final ReadConverter defaultReader = new DefaultReadConverter();
 
 	private Map<Integer, T> dataList;
@@ -65,10 +66,18 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 	}
 
 	public ExcelReader<T> read( String filePath ) throws EncryptedDocumentException, IOException {
-		return read( new File( filePath ) );
+		return read( filePath, activeSheetIndex );
+	}
+	
+	public ExcelReader<T> read( String filePath, int sheetIndex ) throws EncryptedDocumentException, IOException {
+		return read( new File( filePath ), sheetIndex );
+	}
+	
+	public ExcelReader<T> read( File file ) throws EncryptedDocumentException, IOException {
+		return read( file, activeSheetIndex );
 	}
 
-	public ExcelReader<T> read( File file ) throws EncryptedDocumentException, IOException {
+	public ExcelReader<T> read( File file, int sheedIndex ) throws EncryptedDocumentException, IOException {
 		Objects.requireNonNull( file, "The target Excel file could not be null" );
 		if ( !file.exists() ) {
 			throw new IOException( "The target Excel file could not be found : \"" + file.getAbsolutePath() + "\"" );
@@ -77,15 +86,19 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 			throw new IOException( "Failed to read the target Excel file : \"" + file.getAbsolutePath() + "\"" );
 		}
 		try ( Workbook wb = WorkbookFactory.create( file ) ) {
-			parseWorkbook( wb );
+			parseWorkbook( wb, sheedIndex );
 		}
 		return this;
 	}
 
 	public ExcelReader<T> read( InputStream is ) throws EncryptedDocumentException, IOException {
+		return read( is, activeSheetIndex );
+	}
+	
+	public ExcelReader<T> read( InputStream is, int sheedIndex ) throws EncryptedDocumentException, IOException {
 		Objects.requireNonNull( is, "The Excel input stream is null" );
 		try ( Workbook wb = WorkbookFactory.create( is ) ) {
-			parseWorkbook( wb );
+			parseWorkbook( wb, sheedIndex );
 		}
 		return this;
 	}
@@ -105,18 +118,18 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 		return dataList == null ? Collections.emptyList() : new ArrayList<T>( dataList.values() );
 	}
 
-	private void parseWorkbook( Workbook wb ) {
+	private void parseWorkbook( Workbook wb, int sheedIndex ) {
 		if ( isBeanType ) {
-			parseWorkbookWithBean( wb );
+			parseWorkbookWithBean( wb, sheedIndex );
 		} else {
-			parseWorkbookWithObject( wb );
+			parseWorkbookWithObject( wb, sheedIndex );
 		}
 	}
 
-	private void parseWorkbookWithBean( Workbook wb ) {
+	private void parseWorkbookWithBean( Workbook wb, int sheedIndex ) {
 		Objects.requireNonNull( meta, "Excel metadata cannot be null, please initialize first" );
 
-		int activeIndex = wb.getActiveSheetIndex();
+		int activeIndex = sheedIndex == -1 ? sheedIndex : wb.getActiveSheetIndex();
 		Sheet sheet = wb.getSheetAt( activeIndex );
 		initHeader( sheet );
 
@@ -141,11 +154,11 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 		}
 	}
 
-	private void parseWorkbookWithObject( Workbook wb ) {
+	private void parseWorkbookWithObject( Workbook wb, int sheedIndex ) {
 		Objects.requireNonNull( meta,
 				"Excel metadata cannot be empty, please call \"#metadata(ExcelMetadata)\" to initialize" );
 
-		int activeIndex = wb.getActiveSheetIndex();
+		int activeIndex = sheedIndex == -1 ? sheedIndex : wb.getActiveSheetIndex();
 		Sheet sheet = wb.getSheetAt( activeIndex );
 		initHeader( sheet );
 
@@ -182,12 +195,6 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 		}
 	}
 
-	/**
-	 * 
-	 * 
-	 * @param element
-	 * @param index
-	 */
 	private void addDataElement( T element, int index ) {
 		if ( dataList == null ) {
 			this.dataList = new HashMap<Integer, T>();

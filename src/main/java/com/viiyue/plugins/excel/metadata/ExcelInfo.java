@@ -41,10 +41,14 @@ public class ExcelInfo<T> {
 
 	protected ExcelInfo() {}
 
-	public static final <T> ExcelInfo<T> build() {
+	public static final <T> ExcelInfo<T> ofBean() {
 		return new ExcelInfo<T>();
 	}
 
+	public static final ExcelInfo<Map<String,Object>> ofMap() {
+		return new ExcelInfo<Map<String,Object>>();
+	}
+	
 	public ExcelInfo<T> headerIndex( int index ) {
 		this.headerIndex = index;
 		return this;

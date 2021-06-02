@@ -17,11 +17,16 @@ package com.viiyue.plugins.excel.metadata;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +49,7 @@ public class CellInfo<T> {
 	private WriteConverter writer;
 
 	private String [] bools;
+	private String dateformat;
 
 	private Class<?> beanType;
 	private Field field;
@@ -58,6 +64,10 @@ public class CellInfo<T> {
 
 	public static final <T> CellInfo<T> newCell( String label ) {
 		return new CellInfo<T>( label );
+	}
+	
+	public static final CellInfo<Map<String,Object>> newMapCell( String label ) {
+		return new CellInfo<Map<String,Object>>( label );
 	}
 
 	public CellInfo<T> index( int index ) {
@@ -114,8 +124,13 @@ public class CellInfo<T> {
 		return this;
 	}
 
-	public CellInfo<T> bools( String [] bools ) {
+	public CellInfo<T> bools( String ... bools ) {
 		this.bools = bools;
+		return this;
+	}
+	
+	public CellInfo<T> dateformat( String dateformat ) {
+		this.dateformat = dateformat;
 		return this;
 	}
 
@@ -163,6 +178,28 @@ public class CellInfo<T> {
 		return fieldName;
 	}
 
+	public String getDateformat() {
+		return this.dateformat;
+	}
+	
+	public boolean hasDateformat() {
+		return StringUtils.isNotEmpty( dateformat );
+	}
+	
+	public Object formatDate( Date date ) {
+		if ( date != null && hasDateformat() ) {
+			return FastDateFormat.getInstance( dateformat ).format( date );
+		}
+		return date;
+	}
+	
+	public Object formatTemporalAccessor( TemporalAccessor accessor ) {
+		if ( accessor != null && hasDateformat() ) {
+			return DateTimeFormatter.ofPattern( dateformat ).format( accessor );
+		}
+		return accessor;
+	}
+	
 	public boolean hasCustomBoolean() {
 		return ArrayUtils.isNotEmpty( bools );
 	}

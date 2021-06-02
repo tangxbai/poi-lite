@@ -71,7 +71,7 @@ public class MetadataParser<T> {
 
 	private void parseTemplate( Class<?> beanType ) {
 		if ( isBeanType && !metas.containsKey( beanType ) ) {
-			ExcelInfo<T> meta = ExcelInfo.build();
+			ExcelInfo<T> meta = ExcelInfo.<T>ofBean();
 			parseTypeAnnotation( meta );
 			parseMemberAnnotation( meta );
 			metas.put( beanType, meta );
@@ -116,6 +116,7 @@ public class MetadataParser<T> {
 				info.field( beanType, field );
 				info.width( cell.width() );
 				info.bools( cell.bools() );
+				info.dateformat( cell.dateformat() );
 				info.ignoreHeader( cell.ignoreHeader() );
 				info.getter( getter ).setter( setter );
 				info.reader( getSingleton( cell.reader(), ReadConverter.class, null ) );

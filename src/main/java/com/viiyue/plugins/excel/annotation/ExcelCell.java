@@ -32,26 +32,51 @@ import com.viiyue.plugins.excel.converter.WriteConverter;
 public @interface ExcelCell {
 
 	/**
-	 * @return use field name by default
+	 * Sse field name by default
+	 * 
+	 * @return the header cell 
 	 */
-	String label() default "";
+	String label();
 
 	/**
-	 * @return
+	 * Whether to ignore this content during write operation
+	 * 
+	 * @return ignore status
 	 */
-	boolean strip() default false;
-	
 	boolean ignoreHeader() default false;
 
 	/**
-	 * @return excel cell width
+	 * <p>
+	 * Set the cell width, the unit is the number of characters.
+	 * 
+	 * <p>
+	 * <table border="true" width="80%">
+	 * <tr>
+	 * 		<td>TEXT</td>
+	 * 		<td align="center">WIDTH</td>
+	 * </tr>
+	 * <tr>
+	 * 		<td>测试文字</td>
+	 * 		<td align="center">4</td>
+	 * </tr>
+	 * <tr>
+	 * 		<td>Test words</td>
+	 * 		<td align="center">10</td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return the excel cell width
 	 */
 	int width() default 0;
 
-	/**
-	 * @return boolean of automatic width adjustment
-	 */
 	boolean widthAutoSize() default false;
+	
+	/**
+	 * The time format pattern of Date, LocalDate and LocalDateTime.
+	 * 
+	 * @return date format pattern
+	 */
+	String dateformat() default "yyyy-MM-dd HH:mm:ss";
 
 	/**
 	 * @return boolean replacement value, fill in the order of

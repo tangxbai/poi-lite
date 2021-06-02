@@ -246,11 +246,26 @@ public final class ExcelWriter<T> extends ExcelProvider<ExcelWriter<T>, T> {
 			} else if ( Helper.isType( valueType, Number.class ) ) {
 				cell.setCellValue( ( ( Number ) finalValue ).doubleValue() );
 			} else if ( Helper.isType( valueType, Date.class ) ) {
-				cell.setCellValue( ( Date ) value );
+				Date date = ( Date ) value;
+				if ( info.hasDateformat() ) {
+					cell.setCellValue( info.formatDate( date ).toString() );
+				} else {
+					cell.setCellValue( ( Date ) value );
+				}
 			} else if ( Helper.isType( valueType, LocalDate.class ) ) {
-				cell.setCellValue( ( LocalDate ) finalValue );
+				LocalDate ld = ( LocalDate ) finalValue;
+				if ( info.hasDateformat() ) {
+					cell.setCellValue( info.formatTemporalAccessor( ld ).toString() );
+				} else {
+					cell.setCellValue( ld );
+				}
 			} else if ( Helper.isType( valueType, LocalDateTime.class ) ) {
-				cell.setCellValue( ( LocalDateTime ) finalValue );
+				LocalDateTime ldt = ( LocalDateTime ) finalValue;
+				if ( info.hasDateformat() ) {
+					cell.setCellValue( info.formatTemporalAccessor( ldt ).toString() );
+				} else {
+					cell.setCellValue( ldt );
+				}
 			} else {
 				cell.setCellValue( finalValue.toString() );
 			}

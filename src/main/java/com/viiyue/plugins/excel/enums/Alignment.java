@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,11 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
+/**
+ * @author tangxbai
+ * @email tangxbai@hotmail.com
+ * @since 2021/05/28
+ */
 public enum Alignment {
 
 	LEFT_TOP( HorizontalAlignment.LEFT, VerticalAlignment.TOP ),

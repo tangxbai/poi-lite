@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 import com.viiyue.plugins.excel.enums.Alignment;
 import com.viiyue.plugins.excel.metadata.Style;
 
+/**
+ * @author tangxbai
+ * @email tangxbai@hotmail.com
+ * @since 2021/05/28
+ */
 public class DefaultStyleable<T> implements Styleable<T> {
 
 	@Override

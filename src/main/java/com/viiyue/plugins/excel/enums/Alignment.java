@@ -19,31 +19,37 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
+/**
+ * Cell text alignment
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ */
 public enum Alignment {
 
-	LEFT_TOP( HorizontalAlignment.LEFT, VerticalAlignment.TOP ),
-	LEFT_CENTER( HorizontalAlignment.LEFT, VerticalAlignment.CENTER ),
-	LEFT_BOTTOM( HorizontalAlignment.LEFT, VerticalAlignment.BOTTOM ),
-	TOP( HorizontalAlignment.CENTER, VerticalAlignment.TOP ),
-	RIGHT_TOP( HorizontalAlignment.RIGHT, VerticalAlignment.TOP ),
-	RIGHT_CENTER( HorizontalAlignment.RIGHT, VerticalAlignment.CENTER ),
-	RIGHT_BOTTOM( HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM ),
-	BOTTOM( HorizontalAlignment.CENTER, VerticalAlignment.BOTTOM ),
-	CENTER( HorizontalAlignment.CENTER, VerticalAlignment.CENTER );
+    LEFT_TOP( HorizontalAlignment.LEFT, VerticalAlignment.TOP ),
+    LEFT_CENTER( HorizontalAlignment.LEFT, VerticalAlignment.CENTER ),
+    LEFT_BOTTOM( HorizontalAlignment.LEFT, VerticalAlignment.BOTTOM ),
+    TOP( HorizontalAlignment.CENTER, VerticalAlignment.TOP ),
+    RIGHT_TOP( HorizontalAlignment.RIGHT, VerticalAlignment.TOP ),
+    RIGHT_CENTER( HorizontalAlignment.RIGHT, VerticalAlignment.CENTER ),
+    RIGHT_BOTTOM( HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM ),
+    BOTTOM( HorizontalAlignment.CENTER, VerticalAlignment.BOTTOM ),
+    CENTER( HorizontalAlignment.CENTER, VerticalAlignment.CENTER );
 
-	HorizontalAlignment h;
-	VerticalAlignment v;
+    HorizontalAlignment h;
+    VerticalAlignment v;
 
-	private Alignment( HorizontalAlignment h, VerticalAlignment v ) {
-		this.h = h;
-		this.v = v;
-	}
+    private Alignment( HorizontalAlignment h, VerticalAlignment v ) {
+        this.h = h;
+        this.v = v;
+    }
 
-	public void setAlignment( CellStyle style ) {
-		if ( style != null ) {
-			style.setAlignment( h );
-			style.setVerticalAlignment( v );
-		}
-	}
+    public void setAlignment( CellStyle style ) {
+        if ( style != null ) {
+            style.setAlignment( h );
+            style.setVerticalAlignment( v );
+        }
+    }
 
 }

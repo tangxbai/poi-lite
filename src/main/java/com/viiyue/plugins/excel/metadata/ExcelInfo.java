@@ -27,117 +27,124 @@ import com.viiyue.plugins.excel.converter.ReadConverter;
 import com.viiyue.plugins.excel.converter.Styleable;
 import com.viiyue.plugins.excel.converter.WriteConverter;
 
+/**
+ * Bean root metadata wraper
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ * @param <T>
+ */
 public class ExcelInfo<T> {
 
-	private int headerIndex;
-	private int startIndex;
-	private int cellHeight;
-	private boolean strip;
-	private Styleable<T> styleable;
-	private ReadConverter reader;
-	private WriteConverter writer;
-	private List<CellInfo<T>> cells;
-	private Map<String, CellInfo<T>> mappings;
+    private int headerIndex;
+    private int startIndex;
+    private int cellHeight;
+    private boolean strip;
+    private Styleable<T> styleable;
+    private ReadConverter reader;
+    private WriteConverter writer;
+    private List<CellInfo<T>> cells;
+    private Map<String, CellInfo<T>> mappings;
 
-	protected ExcelInfo() {}
+    protected ExcelInfo() {}
 
-	public static final <T> ExcelInfo<T> ofBean() {
-		return new ExcelInfo<T>();
-	}
+    public static final <T> ExcelInfo<T> ofBean() {
+        return new ExcelInfo<T>();
+    }
 
-	public static final ExcelInfo<Map<String,Object>> ofMap() {
-		return new ExcelInfo<Map<String,Object>>();
-	}
-	
-	public ExcelInfo<T> headerIndex( int index ) {
-		this.headerIndex = index;
-		return this;
-	}
+    public static final ExcelInfo<Map<String, Object>> ofMap() {
+        return new ExcelInfo<Map<String, Object>>();
+    }
 
-	public ExcelInfo<T> strip( boolean strip ) {
-		this.strip = strip;
-		return this;
-	}
+    public ExcelInfo<T> headerIndex( int index ) {
+        this.headerIndex = index;
+        return this;
+    }
 
-	public ExcelInfo<T> cellHeight( int cellHeight ) {
-		this.cellHeight = cellHeight;
-		return this;
-	}
+    public ExcelInfo<T> strip( boolean strip ) {
+        this.strip = strip;
+        return this;
+    }
 
-	public ExcelInfo<T> reader( ReadConverter reader ) {
-		this.reader = reader;
-		return this;
-	}
+    public ExcelInfo<T> cellHeight( int cellHeight ) {
+        this.cellHeight = cellHeight;
+        return this;
+    }
 
-	public ExcelInfo<T> writer( WriteConverter writer ) {
-		this.writer = writer;
-		return this;
-	}
+    public ExcelInfo<T> reader( ReadConverter reader ) {
+        this.reader = reader;
+        return this;
+    }
 
-	public ExcelInfo<T> styleable( Styleable<T> styleable ) {
-		this.styleable = styleable;
-		return this;
-	}
+    public ExcelInfo<T> writer( WriteConverter writer ) {
+        this.writer = writer;
+        return this;
+    }
 
-	public ExcelInfo<T> startIndex( int index ) {
-		this.startIndex = index;
-		return this;
-	}
+    public ExcelInfo<T> styleable( Styleable<T> styleable ) {
+        this.styleable = styleable;
+        return this;
+    }
 
-	public ExcelInfo<T> addCell( CellInfo<T> cell ) {
-		if ( cell != null ) {
-			if ( this.cells == null ) {
-				this.cells = new ArrayList<CellInfo<T>>();
-				this.mappings = new HashMap<String, CellInfo<T>>();
-			}
-			if ( cell.getReader() == null ) {
-				cell.reader( reader );
-			}
-			if ( cell.getWriter() == null ) {
-				cell.writer( writer );
-			}
-			if ( cell.getStyleable() == null ) {
-				cell.styleable( styleable );
-			}
-			this.cells.add( cell );
-			this.mappings.put( cell.getLabel(), cell );
-		}
-		return this;
-	}
+    public ExcelInfo<T> startIndex( int index ) {
+        this.startIndex = index;
+        return this;
+    }
 
-	public ExcelInfo<T> cells( String ... labels ) {
-		for ( String label : labels ) {
-			addCell( CellInfo.newCell( label ) );
-		}
-		return this;
-	}
+    public ExcelInfo<T> addCell( CellInfo<T> cell ) {
+        if ( cell != null ) {
+            if ( this.cells == null ) {
+                this.cells = new ArrayList<CellInfo<T>>();
+                this.mappings = new HashMap<String, CellInfo<T>>();
+            }
+            if ( cell.getReader() == null ) {
+                cell.reader( reader );
+            }
+            if ( cell.getWriter() == null ) {
+                cell.writer( writer );
+            }
+            if ( cell.getStyleable() == null ) {
+                cell.styleable( styleable );
+            }
+            this.cells.add( cell );
+            this.mappings.put( cell.getLabel(), cell );
+        }
+        return this;
+    }
 
-	public CellInfo<T> getByLabel( String label ) {
-		return mappings == null ? null : mappings.get( strip ? StringUtils.strip( label ) : label );
-	}
+    public ExcelInfo<T> cells( String ... labels ) {
+        for ( String label : labels ) {
+            addCell( CellInfo.newCell( label ) );
+        }
+        return this;
+    }
 
-	public List<CellInfo<T>> getCells() {
-		return cells;
-	}
+    public CellInfo<T> getByLabel( String label ) {
+        return mappings == null ? null : mappings.get( strip ? StringUtils.strip( label ) : label );
+    }
 
-	public boolean hasCells() {
-		return CollectionUtils.isNotEmpty( cells );
-	}
+    public List<CellInfo<T>> getCells() {
+        return cells;
+    }
 
-	public Styleable<T> getStyleable() {
-		return styleable;
-	}
+    public boolean hasCells() {
+        return CollectionUtils.isNotEmpty( cells );
+    }
 
-	public int getHeaderIndex() {
-		return headerIndex;
-	}
+    public Styleable<T> getStyleable() {
+        return styleable;
+    }
 
-	public int getStartIndex() {
-		return startIndex == 0 ? headerIndex + 1 : startIndex;
-	}
+    public int getHeaderIndex() {
+        return headerIndex;
+    }
 
-	public int getCellHeight() {
-		return this.cellHeight;
-	}
+    public int getStartIndex() {
+        return startIndex == 0 ? headerIndex + 1 : startIndex;
+    }
+
+    public int getCellHeight() {
+        return this.cellHeight;
+    }
 
 }

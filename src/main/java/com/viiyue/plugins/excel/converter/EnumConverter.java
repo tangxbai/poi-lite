@@ -15,10 +15,17 @@
  */
 package com.viiyue.plugins.excel.converter;
 
+/**
+ * Enum data converter
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ * @param <T>
+ */
 public interface EnumConverter<T extends Enum<?>> {
 
-	String getValue();
+    String getValue();
 
-	T getDefault();
+    T getDefault();
 
 }

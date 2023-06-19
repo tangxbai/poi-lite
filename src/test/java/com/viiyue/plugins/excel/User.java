@@ -26,7 +26,6 @@ import com.viiyue.plugins.excel.annotation.ExcelCell;
 import com.viiyue.plugins.excel.converter.AbstractConverter;
 import com.viiyue.plugins.excel.converter.DefaultStyleable;
 import com.viiyue.plugins.excel.converter.WriteConverter;
-import com.viiyue.plugins.excel.enums.Gender;
 import com.viiyue.plugins.excel.metadata.Style;
 
 import lombok.Getter;

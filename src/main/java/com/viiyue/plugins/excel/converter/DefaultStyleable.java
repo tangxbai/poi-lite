@@ -21,6 +21,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 import com.viiyue.plugins.excel.enums.Alignment;
 import com.viiyue.plugins.excel.metadata.Style;
 
+/**
+ * Default cell-style processor
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ * @param <T> the cell-bound data
+ */
 public class DefaultStyleable<T> implements Styleable<T> {
 
 	@Override

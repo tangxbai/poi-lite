@@ -22,59 +22,65 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Common helper
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ */
 public class Helper {
 
-	private static final Logger log = LoggerFactory.getLogger( Helper.class );
+    private static final Logger log = LoggerFactory.getLogger( Helper.class );
 
-	public static boolean isType( Class<?> source, Class<?> target ) {
-		return Objects.equals( source, target ) || target.isAssignableFrom( source );
-	}
+    public static boolean isType( Class<?> source, Class<?> target ) {
+        return Objects.equals( source, target ) || target.isAssignableFrom( source );
+    }
 
-	public static final void setFieldValue( Object instance, Method setter, Field field, Object value ) {
-		if ( setter != null ) {
-			try {
-				if ( !setter.isAccessible() ) {
-					setter.setAccessible( true );
-				}
-				setter.invoke( instance, value );
-			} catch ( Exception e ) {
-				log.error( e.getMessage(), e );
-			}
-		}
-		if ( field != null ) {
-			try {
-				if ( !field.isAccessible() ) {
-					field.setAccessible( true );
-				}
-				field.set( instance, value );
-			} catch ( Exception e ) {
-				log.error( e.getMessage(), e );
-			}
-		}
-	}
+    public static final void setFieldValue( Object instance, Method setter, Field field, Object value ) {
+        if ( setter != null ) {
+            try {
+                if ( !setter.isAccessible() ) {
+                    setter.setAccessible( true );
+                }
+                setter.invoke( instance, value );
+            } catch ( Exception e ) {
+                log.error( e.getMessage(), e );
+            }
+        }
+        if ( field != null ) {
+            try {
+                if ( !field.isAccessible() ) {
+                    field.setAccessible( true );
+                }
+                field.set( instance, value );
+            } catch ( Exception e ) {
+                log.error( e.getMessage(), e );
+            }
+        }
+    }
 
-	public static final Object getFieldValue( Object instance, Method getter, Field field ) {
-		if ( getter != null ) {
-			try {
-				if ( !getter.isAccessible() ) {
-					getter.setAccessible( true );
-				}
-				return getter.invoke( instance );
-			} catch ( Exception e ) {
-				log.error( e.getMessage(), e );
-			}
-		}
-		if ( field != null ) {
-			try {
-				if ( !field.isAccessible() ) {
-					field.setAccessible( true );
-				}
-				return field.get( instance );
-			} catch ( Exception e ) {
-				log.error( e.getMessage(), e );
-			}
-		}
-		return null;
-	}
+    public static final Object getFieldValue( Object instance, Method getter, Field field ) {
+        if ( getter != null ) {
+            try {
+                if ( !getter.isAccessible() ) {
+                    getter.setAccessible( true );
+                }
+                return getter.invoke( instance );
+            } catch ( Exception e ) {
+                log.error( e.getMessage(), e );
+            }
+        }
+        if ( field != null ) {
+            try {
+                if ( !field.isAccessible() ) {
+                    field.setAccessible( true );
+                }
+                return field.get( instance );
+            } catch ( Exception e ) {
+                log.error( e.getMessage(), e );
+            }
+        }
+        return null;
+    }
 
 }

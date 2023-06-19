@@ -33,129 +33,137 @@ import com.viiyue.plugins.excel.converter.ReadConverter;
 import com.viiyue.plugins.excel.converter.Styleable;
 import com.viiyue.plugins.excel.converter.WriteConverter;
 
+/**
+ * Bean metadata parser
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ * @param <T> your data bean object
+ */
 public class MetadataParser<T> {
 
-	protected static final Logger log = LoggerFactory.getLogger( MetadataParser.class );
-	private static final Map<Class<?>, ExcelInfo<?>> metas = new ConcurrentHashMap<Class<?>, ExcelInfo<?>>( 8 );
-	private static final Map<Class<?>, Object> caches = new ConcurrentHashMap<Class<?>, Object>( 8 );
+    protected static final Logger log = LoggerFactory.getLogger( MetadataParser.class );
+    private static final Map<Class<?>, ExcelInfo<?>> metas = new ConcurrentHashMap<Class<?>, ExcelInfo<?>>( 8 );
+    private static final Map<Class<?>, Object> caches = new ConcurrentHashMap<Class<?>, Object>( 8 );
 
-	protected final Class<?> beanType;
-	protected final boolean isBeanType;
+    protected final Class<?> beanType;
+    protected final boolean isBeanType;
 
-	public MetadataParser( Class<?> beanType ) {
-		this.beanType = beanType;
-		this.isBeanType = !Objects.equals( beanType, Object.class );
-		this.parseTemplate( beanType );
-	}
+    public MetadataParser( Class<?> beanType ) {
+        this.beanType = beanType;
+        this.isBeanType = !Objects.equals( beanType, Object.class );
+        this.parseTemplate( beanType );
+    }
 
-	public boolean isBeanType() {
-		return this.isBeanType;
-	}
+    public boolean isBeanType() {
+        return this.isBeanType;
+    }
 
-	public ExcelInfo<T> getMetadata( Class<T> beanType ) {
-		return ( ExcelInfo<T> ) metas.get( beanType );
-	}
+    public ExcelInfo<T> getMetadata( Class<T> beanType ) {
+        return ( ExcelInfo<T> ) metas.get( beanType );
+    }
 
-	public <K> K newInstance( Class<K> clazz ) {
-		if ( clazz != null ) {
-			try {
-				return clazz.newInstance();
-			} catch ( InstantiationException e ) {
-				log.error( e.getMessage(), e );
-			} catch ( IllegalAccessException e ) {
-				log.error( e.getMessage(), e );
-			}
-		}
-		return null;
-	}
+    public <K> K newInstance( Class<K> clazz ) {
+        if ( clazz != null ) {
+            try {
+                return clazz.newInstance();
+            } catch ( InstantiationException e ) {
+                log.error( e.getMessage(), e );
+            } catch ( IllegalAccessException e ) {
+                log.error( e.getMessage(), e );
+            }
+        }
+        return null;
+    }
 
-	private void parseTemplate( Class<?> beanType ) {
-		if ( isBeanType && !metas.containsKey( beanType ) ) {
-			ExcelInfo<T> meta = ExcelInfo.<T>ofBean();
-			parseTypeAnnotation( meta );
-			parseMemberAnnotation( meta );
-			metas.put( beanType, meta );
-		}
-	}
+    private void parseTemplate( Class<?> beanType ) {
+        if ( isBeanType && !metas.containsKey( beanType ) ) {
+            ExcelInfo<T> meta = ExcelInfo.<T> ofBean();
+            parseTypeAnnotation( meta );
+            parseMemberAnnotation( meta );
+            metas.put( beanType, meta );
+        }
+    }
 
-	private void parseTypeAnnotation( ExcelInfo<T> meta ) {
-		Excel excel = beanType.getAnnotation( Excel.class );
-		if ( excel != null ) {
-			meta.strip( excel.strip() );
-			meta.headerIndex( excel.headerIndex() );
-			meta.startIndex( excel.startIndex() );
-			meta.cellHeight( excel.cellHeight() );
-			meta.styleable( getSingleton( excel.styleable(), Styleable.class, null ) );
-		}
-	}
+    private void parseTypeAnnotation( ExcelInfo<T> meta ) {
+        Excel excel = beanType.getAnnotation( Excel.class );
+        if ( excel != null ) {
+            meta.strip( excel.strip() );
+            meta.headerIndex( excel.headerIndex() );
+            meta.startIndex( excel.startIndex() );
+            meta.cellHeight( excel.cellHeight() );
+            meta.styleable( getSingleton( excel.styleable(), Styleable.class, null ) );
+        }
+    }
 
-	private void parseMemberAnnotation( ExcelInfo<T> meta ) {
-		for ( Field field : beanType.getDeclaredFields() ) {
-			int modifiers = field.getModifiers();
-			if ( Modifier.isFinal( modifiers ) && Modifier.isStatic( modifiers ) ) {
-				continue;
-			}
+    private void parseMemberAnnotation( ExcelInfo<T> meta ) {
+        for ( Field field : beanType.getDeclaredFields() ) {
+            int modifiers = field.getModifiers();
+            if ( Modifier.isFinal( modifiers ) && Modifier.isStatic( modifiers ) ) {
+                continue;
+            }
 
-			Method getter = null;
-			Method setter = null;
-			try {
-				PropertyDescriptor descriptor = new PropertyDescriptor( field.getName(), beanType );
-				getter = descriptor.getReadMethod();
-				setter = descriptor.getWriteMethod();
-			} catch ( IntrospectionException e ) {
-				log.warn( "Field \"{}\" in class \"{}\" has no getter method", field.getName(), beanType.getName() );
-			}
+            Method getter = null;
+            Method setter = null;
+            try {
+                PropertyDescriptor descriptor = new PropertyDescriptor( field.getName(), beanType );
+                getter = descriptor.getReadMethod();
+                setter = descriptor.getWriteMethod();
+            } catch ( IntrospectionException e ) {
+                log.warn( "\"{}\" is not a standard Java Bean, and \"{}\" did not find the getter/setter method.",
+                        beanType.getName(), field.getName() );
+            }
 
-			ExcelCell cell = field.getAnnotation( ExcelCell.class );
-			if ( cell == null && getter != null ) {
-				cell = getter.getAnnotation( ExcelCell.class );
-			}
+            ExcelCell cell = field.getAnnotation( ExcelCell.class );
+            if ( cell == null && getter != null ) {
+                cell = getter.getAnnotation( ExcelCell.class );
+            }
 
-			if ( cell != null ) {
-				CellInfo<T> info = CellInfo.newCell( cell.label() );
-				info.field( beanType, field );
-				info.width( cell.width() );
-				info.bools( cell.bools() );
-				info.dateformat( cell.dateformat() );
-				info.ignoreHeader( cell.ignoreHeader() );
-				info.getter( getter ).setter( setter );
-				info.reader( getSingleton( cell.reader(), ReadConverter.class, null ) );
-				info.writer( getSingleton( cell.writer(), WriteConverter.class, null ) );
-				info.styleable( getSingleton( cell.styleable(), Styleable.class, meta.getStyleable() ) );
-				info.widthAutoSize( cell.widthAutoSize() );
-				meta.addCell( info );
-			}
-		}
-	}
+            if ( cell != null ) {
+                CellInfo<T> info = CellInfo.newCell( cell.label() );
+                info.field( beanType, field );
+                info.width( cell.width() );
+                info.bools( cell.bools() );
+                info.dateformat( cell.dateformat() );
+                info.ignoreHeader( cell.ignoreHeader() );
+                info.getter( getter ).setter( setter );
+                info.reader( getSingleton( cell.reader(), ReadConverter.class, null ) );
+                info.writer( getSingleton( cell.writer(), WriteConverter.class, null ) );
+                info.styleable( getSingleton( cell.styleable(), Styleable.class, meta.getStyleable() ) );
+                info.widthAutoSize( cell.widthAutoSize() );
+                meta.addCell( info );
+            }
+        }
+    }
 
-	private <K> K getSingleton( Class<?> cacheType, Class<K> targetType, K defaultValue ) {
-		if ( cacheType == null ) {
-			return defaultValue;
-		}
-		if ( !targetType.isInterface() || Objects.equals( cacheType, targetType ) ) {
-			return defaultValue;
-		}
-		if ( cacheType.isInterface() ) {
-			log.error( "{} cannot be an interface of \"{}\"", targetType.getSimpleName(), cacheType.getName() );
-			return defaultValue;
-		}
-		Object object = null;
-		synchronized ( caches ) {
-			object = caches.get( cacheType );
-			if ( object == null ) {
-				object = newInstance( cacheType );
-				if ( object != null ) {
-					caches.put( cacheType, object );
-				}
-			}
-		}
-		if ( object != null ) {
-			Class<? extends Object> valueType = object.getClass();
-			if ( Objects.equals( targetType, valueType ) || targetType.isAssignableFrom( valueType ) ) {
-				return targetType.cast( object );
-			}
-		}
-		return defaultValue;
-	}
+    private <K> K getSingleton( Class<?> cacheType, Class<K> targetType, K defaultValue ) {
+        if ( cacheType == null ) {
+            return defaultValue;
+        }
+        if ( !targetType.isInterface() || Objects.equals( cacheType, targetType ) ) {
+            return defaultValue;
+        }
+        if ( cacheType.isInterface() ) {
+            log.error( "{} cannot be an interface of \"{}\"", targetType.getSimpleName(), cacheType.getName() );
+            return defaultValue;
+        }
+        Object object = null;
+        synchronized ( caches ) {
+            object = caches.get( cacheType );
+            if ( object == null ) {
+                object = newInstance( cacheType );
+                if ( object != null ) {
+                    caches.put( cacheType, object );
+                }
+            }
+        }
+        if ( object != null ) {
+            Class<? extends Object> valueType = object.getClass();
+            if ( Objects.equals( targetType, valueType ) || targetType.isAssignableFrom( valueType ) ) {
+                return targetType.cast( object );
+            }
+        }
+        return defaultValue;
+    }
 
 }

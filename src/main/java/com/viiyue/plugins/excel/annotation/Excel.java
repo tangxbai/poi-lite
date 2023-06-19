@@ -24,6 +24,12 @@ import java.lang.annotation.Target;
 import com.viiyue.plugins.excel.converter.DefaultStyleable;
 import com.viiyue.plugins.excel.converter.Styleable;
 
+/**
+ * Excel root metadata descriptor
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ */
 @Documented
 @Target( { ElementType.TYPE } )
 @Retention( RetentionPolicy.RUNTIME )

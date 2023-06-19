@@ -20,8 +20,14 @@ import org.apache.poi.ss.usermodel.CellType;
 
 import com.viiyue.plugins.excel.metadata.CellInfo;
 
+/**
+ * Cell data read converter
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ */
 public interface ReadConverter {
 
-	Object readIt( CellInfo<?> info, Class<?> fieldType, CellType cellType, Cell cell );
+    Object readIt( CellInfo<?> info, Class<?> fieldType, CellType cellType, Cell cell );
 
 }

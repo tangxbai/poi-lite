@@ -35,6 +35,13 @@ import com.viiyue.plugins.excel.converter.ReadConverter;
 import com.viiyue.plugins.excel.converter.Styleable;
 import com.viiyue.plugins.excel.converter.WriteConverter;
 
+/**
+ * Cell metadata wrapper
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ * @param <T>
+ */
 public class CellInfo<T> {
 
 	protected static final Logger log = LoggerFactory.getLogger( CellInfo.class );

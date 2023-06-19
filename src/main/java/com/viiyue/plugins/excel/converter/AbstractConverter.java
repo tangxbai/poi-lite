@@ -20,36 +20,40 @@ import java.util.Objects;
 
 import org.apache.poi.ss.usermodel.CellType;
 
+/**
+ * Abstract excel cell converter
+ *
+ * @author tangxbai
+ * @since 2023/06/19
+ */
 public class AbstractConverter {
 
-	protected static final String [] BOOLEANS = { "Y", "N", "TRUE", "FALSE", "T", "F", "1", "0" };
-	protected static final ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>() {
+    protected static final String [] BOOLEANS = { "Y", "N", "TRUE", "FALSE", "T", "F", "1", "0" };
+    protected static final ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+        }
+    };
 
-		@Override
-		protected SimpleDateFormat initialValue() {
-			return new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-		}
+    public boolean isString( CellType cellType ) {
+        return cellType == CellType.STRING;
+    }
 
-	};
+    public boolean isFormula( CellType cellType ) {
+        return cellType == CellType.FORMULA;
+    }
 
-	public boolean isString( CellType cellType ) {
-		return cellType == CellType.STRING;
-	}
+    public boolean isBoolean( CellType cellType ) {
+        return cellType == CellType.BOOLEAN;
+    }
 
-	public boolean isFormula( CellType cellType ) {
-		return cellType == CellType.FORMULA;
-	}
+    public boolean isNumber( CellType cellType ) {
+        return cellType == CellType.NUMERIC;
+    }
 
-	public boolean isBoolean( CellType cellType ) {
-		return cellType == CellType.BOOLEAN;
-	}
-
-	public boolean isNumber( CellType cellType ) {
-		return cellType == CellType.NUMERIC;
-	}
-
-	public boolean isType( Class<?> source, Class<?> target ) {
-		return Objects.equals( source, target ) || target.isAssignableFrom( source );
-	}
+    public boolean isType( Class<?> source, Class<?> target ) {
+        return Objects.equals( source, target ) || target.isAssignableFrom( source );
+    }
 
 }

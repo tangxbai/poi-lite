@@ -157,7 +157,7 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 	private void parseWorkbookWithObject( Workbook wb, int sheedIndex ) {
 		Objects.requireNonNull( meta, "Excel metadata cannot be empty, please call \"#metadata(ExcelMetadata)\" to initialize" );
 
-		int activeIndex = sheedIndex == -1 ? sheedIndex : wb.getActiveSheetIndex();
+		int activeIndex = sheedIndex == defaultSheetIndex ? wb.getActiveSheetIndex() : sheedIndex;
 		Sheet sheet = wb.getSheetAt( activeIndex );
 		initHeader( sheet );
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,11 @@ import com.viiyue.plugins.excel.metadata.ExcelInfo;
  * Excel <code>poi</code> reader
  * 
  * @author tangxbai
- * @email tangxbai@hotmail.com
- * @since 2021/05/28
+ * @since 1.0.0
  */
 public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 
-	private static final int activeSheetIndex = -1;
+	private static final int defaultSheetIndex = -1;
 	private static final ReadConverter defaultReader = new DefaultReadConverter();
 
 	private Map<Integer, T> dataList;
@@ -66,7 +65,7 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 	}
 
 	public ExcelReader<T> read( String filePath ) throws EncryptedDocumentException, IOException {
-		return read( filePath, activeSheetIndex );
+		return read( filePath, defaultSheetIndex );
 	}
 	
 	public ExcelReader<T> read( String filePath, int sheetIndex ) throws EncryptedDocumentException, IOException {
@@ -74,7 +73,7 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 	}
 	
 	public ExcelReader<T> read( File file ) throws EncryptedDocumentException, IOException {
-		return read( file, activeSheetIndex );
+		return read( file, defaultSheetIndex );
 	}
 
 	public ExcelReader<T> read( File file, int sheedIndex ) throws EncryptedDocumentException, IOException {
@@ -92,7 +91,7 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 	}
 
 	public ExcelReader<T> read( InputStream is ) throws EncryptedDocumentException, IOException {
-		return read( is, activeSheetIndex );
+		return read( is, defaultSheetIndex );
 	}
 	
 	public ExcelReader<T> read( InputStream is, int sheedIndex ) throws EncryptedDocumentException, IOException {
@@ -129,7 +128,7 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 	private void parseWorkbookWithBean( Workbook wb, int sheedIndex ) {
 		Objects.requireNonNull( meta, "Excel metadata cannot be null, please initialize first" );
 
-		int activeIndex = sheedIndex == -1 ? sheedIndex : wb.getActiveSheetIndex();
+		int activeIndex = sheedIndex == defaultSheetIndex ? wb.getActiveSheetIndex() : sheedIndex;
 		Sheet sheet = wb.getSheetAt( activeIndex );
 		initHeader( sheet );
 
@@ -155,10 +154,9 @@ public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 	}
 
 	private void parseWorkbookWithObject( Workbook wb, int sheedIndex ) {
-		Objects.requireNonNull( meta,
-				"Excel metadata cannot be empty, please call \"#metadata(ExcelMetadata)\" to initialize" );
+		Objects.requireNonNull( meta, "Excel metadata cannot be empty, please call \"#metadata(ExcelMetadata)\" to initialize" );
 
-		int activeIndex = sheedIndex == -1 ? sheedIndex : wb.getActiveSheetIndex();
+		int activeIndex = sheedIndex == defaultSheetIndex ? wb.getActiveSheetIndex() : sheedIndex;
 		Sheet sheet = wb.getSheetAt( activeIndex );
 		initHeader( sheet );
 

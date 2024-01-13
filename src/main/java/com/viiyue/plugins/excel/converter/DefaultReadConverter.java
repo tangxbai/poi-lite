@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package com.viiyue.plugins.excel.converter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -27,21 +26,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.RichTextString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.viiyue.plugins.excel.metadata.CellInfo;
 
+/**
+ * @author tangxbai
+ * @since 1.0.0
+ */
 public class DefaultReadConverter extends AbstractConverter implements ReadConverter {
 
-    private final Logger log = LoggerFactory.getLogger( getClass() );
-
-    @Override
-    public Object readIt( CellInfo<?> info, Class<?> fieldType, CellType cellType, Cell cell ) {
-        // Normal object value
-        if ( fieldType == null ) {
-            return readObjectValue( cellType, cell, null );
-        }
+	@Override
+	public Object readIt( CellInfo<?> info, Class<?> fieldType, CellType cellType, Cell cell ) {
+		// Normal object value
+		if ( fieldType == null ) {
+			return readObjectValue( cellType, cell, null );
+		}
 
         // String
         if ( isType( fieldType, CharSequence.class ) ) {
@@ -164,41 +163,41 @@ public class DefaultReadConverter extends AbstractConverter implements ReadConve
         return converters[ 0 ].getDefault();
     }
 
-    public Date readDateValue( CellType cellType, Cell cell ) {
-        if ( isNumber( cellType ) ) {
-            try {
-                return cell.getDateCellValue();
-            } catch ( Exception e ) {
-                return new Date( ( long ) cell.getNumericCellValue() );
-            }
-        }
-        if ( isString( cellType ) ) {
-            try {
-                String v = cell.getStringCellValue();
-                return formatter.get().parse( v );
-            } catch ( ParseException e ) {
-                log.error( e.getMessage(), e );
-            }
-        }
-        return null;
-    }
+	public Date readDateValue( CellType cellType, Cell cell ) {
+		if ( isNumber( cellType ) ) {
+			try {
+				return cell.getDateCellValue();
+			} catch ( Exception e ) {
+				return new Date( ( long ) cell.getNumericCellValue() );
+			}
+		}
+		if ( isString( cellType ) ) {
+			return defaultString2Date( cell.getStringCellValue() );
+		}
+		return null;
+	}
 
-    public Boolean readBooleanValue( CellType cellType, CellInfo<?> info, Cell cell ) {
-        if ( isBoolean( cellType ) ) {
-            return cell.getBooleanCellValue();
-        }
-        if ( isNumber( cellType ) ) {
-            return cell.getNumericCellValue() != 0D;
-        }
-        if ( isString( cellType ) ) {
-            String boolanValue = cell.getStringCellValue();
-            if ( info != null && info.hasCustomBoolean() ) {
-                return info.getBoolean( boolanValue );
-            }
-            return StringUtils.equalsAny( boolanValue, BOOLEANS );
-        }
-        return null;
-    }
+	public Boolean readBooleanValue( CellType cellType, CellInfo<?> info, Cell cell ) {
+		if ( isBoolean( cellType ) ) {
+			return cell.getBooleanCellValue();
+		}
+		if ( isNumber( cellType ) ) {
+			return cell.getNumericCellValue() != 0D;
+		}
+		if ( isString( cellType ) ) {
+			String boolanValue = cell.getStringCellValue();
+			if ( info != null && info.hasCustomBoolean() ) {
+				return info.getBoolean( boolanValue );
+			}
+			if ( StringUtils.equalsAny( boolanValue, BOOLEAN_TRUE ) ) {
+				return Boolean.TRUE;
+			}
+			if ( StringUtils.equalsAny( boolanValue, BOOLEAN_FALSE ) ) {
+				return Boolean.FALSE;
+			}
+		}
+		return null;
+	}
 
     public Double readDoubleValue( CellType cellType, Cell cell ) {
         if ( isNumber( cellType ) ) {

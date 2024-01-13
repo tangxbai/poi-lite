@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@ import com.viiyue.plugins.excel.metadata.CellInfo;
  * Cell data read converter
  *
  * @author tangxbai
- * @since 2023/06/19
+ * @since 1.0.0
  */
 public interface ReadConverter {
-
-    Object readIt( CellInfo<?> info, Class<?> fieldType, CellType cellType, Cell cell );
-
+	Object readIt( CellInfo<?> info, Class<?> fieldType, CellType cellType, Cell cell );
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,59 @@
  */
 package com.viiyue.plugins.excel.converter;
 
-import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Objects;
 
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.poi.ss.usermodel.CellType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Abstract excel cell converter
- *
  * @author tangxbai
- * @since 2023/06/19
+ * @since 1.0.0
  */
 public class AbstractConverter {
 
-    protected static final String [] BOOLEANS = { "Y", "N", "TRUE", "FALSE", "T", "F", "1", "0" };
-    protected static final ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-        }
-    };
+	protected final Logger log = LoggerFactory.getLogger( getClass() );
+	protected static final String [] BOOLEAN_TRUE = { "Y", "YES", "ON", "TRUE", "T", "1" };
+	protected static final String [] BOOLEAN_FALSE = { "N", "NO", "OFF", "FALSE", "F", "0" };
+	protected static final String DEFAULT_DATE_FORMAT_TEMPLATE = "yyyy-MM-dd HH:mm:ss";
 
-    public boolean isString( CellType cellType ) {
-        return cellType == CellType.STRING;
-    }
+	public boolean isString( CellType cellType ) {
+		return cellType == CellType.STRING;
+	}
 
-    public boolean isFormula( CellType cellType ) {
-        return cellType == CellType.FORMULA;
-    }
+	public boolean isFormula( CellType cellType ) {
+		return cellType == CellType.FORMULA;
+	}
 
-    public boolean isBoolean( CellType cellType ) {
-        return cellType == CellType.BOOLEAN;
-    }
+	public boolean isBoolean( CellType cellType ) {
+		return cellType == CellType.BOOLEAN;
+	}
 
-    public boolean isNumber( CellType cellType ) {
-        return cellType == CellType.NUMERIC;
-    }
+	public boolean isNumber( CellType cellType ) {
+		return cellType == CellType.NUMERIC;
+	}
 
-    public boolean isType( Class<?> source, Class<?> target ) {
-        return Objects.equals( source, target ) || target.isAssignableFrom( source );
-    }
+	public boolean isType( Class<?> source, Class<?> target ) {
+		return Objects.equals( source, target ) || target.isAssignableFrom( source );
+	}
+	
+	public Date defaultString2Date( String dateString ) {
+		try {
+			FastDateFormat formatter = FastDateFormat.getInstance( DEFAULT_DATE_FORMAT_TEMPLATE );
+			return formatter.parse( dateString );
+		} catch ( ParseException e ) {
+			log.error( e.getMessage(), e );
+		}
+		return null;
+	}
+	
+	public String defaultDate2String( Date date ) {
+		FastDateFormat formatter = FastDateFormat.getInstance( DEFAULT_DATE_FORMAT_TEMPLATE );
+		return formatter.format( date );
+	}
 
 }

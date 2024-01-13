@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import com.viiyue.plugins.excel.annotation.ExcelCell;
 import com.viiyue.plugins.excel.converter.AbstractConverter;
 import com.viiyue.plugins.excel.converter.DefaultStyleable;
 import com.viiyue.plugins.excel.converter.WriteConverter;
+import com.viiyue.plugins.excel.enums.Gender;
 import com.viiyue.plugins.excel.metadata.Style;
 
 import lombok.Getter;
@@ -75,7 +76,7 @@ public class User implements Serializable {
 	public static class MyWriteConverter extends AbstractConverter implements WriteConverter {
 		@Override
 		public Object convert( Object value ) {
-			return formatter.get().format( ( Date ) value );
+			return defaultDate2String( ( Date ) value );
 		}
 	}
 

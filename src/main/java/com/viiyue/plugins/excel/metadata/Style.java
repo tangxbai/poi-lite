@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
@@ -42,50 +43,63 @@ import com.viiyue.plugins.excel.converter.Styleable;
 import com.viiyue.plugins.excel.enums.Alignment;
 
 /**
+ * Cell beautification style
+ *
  * @author tangxbai
- * @email tangxbai@hotmail.com
- * @since 2021/05/28
+ * @since 1.0.0
  */
 public class Style {
 
-	private static final Logger log = LoggerFactory.getLogger( Styleable.class );
+	private static final Logger LOG = LoggerFactory.getLogger( Styleable.class );
 
-	private static final int colorBegin = 8;
-	private static final int colorBound = IndexedColors.values().length - 1; // 64
-	private static final int colorSize = colorBound - colorBegin; // 56 colors
-	private static final ConcurrentMap<String, Font> fonts = new ConcurrentHashMap<>( 8 );
-	private static final ConcurrentMap<String, Short> colors = new ConcurrentHashMap<>( 8 );
-	private static final ConcurrentMap<String, CellStyle> styles = new ConcurrentHashMap<>( 8 );
-	private static final ConcurrentMap<String, Style> beautifys = new ConcurrentHashMap<>( 64 );
+	private static final int COLOR_BEGIN = 8;
+	private static final int COLOR_BOUND = IndexedColors.values().length - 1; // 64
+	private static final int COLOR_SIZE = COLOR_BOUND - COLOR_BEGIN; // 56 colors
+	private static final ConcurrentMap<String, Font> FONTS = new ConcurrentHashMap<>( 128 );
+	private static final ConcurrentMap<String, Short> COLORS = new ConcurrentHashMap<>( 128 );
+	private static final ConcurrentMap<String, Style> INSTANCES = new ConcurrentHashMap<>( 128 );
 
 	private final Workbook wb;
 	private final CellStyle style;
 	private final boolean isXssf;
 	private final boolean isHssf;
-	private final String cacheKey;
+	private final String namespace;
 
-	public static final Style of( Workbook wb, String cacheKey ) {
+	private static final String getCacheKey( Workbook wb, String cacheKey ) {
+		return Integer.toHexString( wb.hashCode() ) + ":" + cacheKey;
+	}
+
+	public static final void clear( Workbook wb ) {
 		Objects.requireNonNull( wb, "Workbook object cannot be null" );
-		String bsk = wb.getClass().getSimpleName() + ":" + cacheKey;
-		Style style = beautifys.get( bsk );
+		String cachePrefix = getCacheKey( wb, "" );
+		Predicate<String> predicate = key -> StringUtils.startsWith( key, cachePrefix );
+		FONTS.keySet().removeIf( predicate );
+		COLORS.keySet().removeIf( predicate );
+		INSTANCES.keySet().removeIf( predicate );
+	}
+
+	public static final Style of( Workbook wb, String namespace ) {
+		Objects.requireNonNull( wb, "Workbook object cannot be null" );
+		String cacheKey = getCacheKey( wb, namespace );
+		Style style = INSTANCES.get( cacheKey );
 		if ( style == null ) {
-			beautifys.put( bsk, style = new Style( wb, cacheKey ) ); // Avoid instantiating too many objects
+			INSTANCES.put( cacheKey, style = new Style( wb, namespace ) );
 		}
 		return style;
 	}
 
-	private Style( Workbook wb, String cacheKey ) {
+	private Style( Workbook wb, String namespace ) {
 		this.wb = wb;
-		this.cacheKey = cacheKey;
-		this.style = newStyle( cacheKey );
+		this.namespace = namespace;
+		this.style = wb.createCellStyle();
 		this.isHssf = wb instanceof HSSFWorkbook;
 		this.isXssf = wb instanceof XSSFWorkbook;
 	}
 
-	public boolean is( String cacheKey ) {
-		return Objects.equals( cacheKey, this.cacheKey ) || StringUtils.startsWith( this.cacheKey, cacheKey );
+	public boolean is( String namespace ) {
+		return Objects.equals( this.namespace, namespace ) || StringUtils.startsWith( this.namespace, namespace );
 	}
-	
+
 	public Style autoWrap() {
 		style.setWrapText( true );
 		return this;
@@ -111,11 +125,11 @@ public class Style {
 		style.setFont( newFont( fontName, fontColor, fontSize, blod ) );
 		return this;
 	}
-	
+
 	public Style fontColor( String fontColor ) {
 		return font( "default", fontColor, -1, false );
 	}
-	
+
 	public Style bgColor( String bgColor ) {
 		style.setFillPattern( FillPatternType.SOLID_FOREGROUND );
 		if ( isHssf ) {
@@ -168,14 +182,6 @@ public class Style {
 		}
 	}
 
-	private CellStyle newStyle( String cacheKey ) {
-		CellStyle style = styles.get( cacheKey );
-		if ( style == null ) {
-			styles.put( cacheKey, style = wb.createCellStyle() );
-		}
-		return style;
-	}
-
 	private XSSFColor newXssfColor( String hexColor ) {
 		XSSFWorkbook xwb = ( XSSFWorkbook ) wb;
 		StylesTable source = xwb.getStylesSource();
@@ -189,8 +195,8 @@ public class Style {
 		if ( fontColor == null ) {
 			fontColor = "#";
 		}
-		String cacheKey = fontName + ":" + fontSize + ":" + fontColor + ":" + blod;
-		Font font = fonts.get( cacheKey );
+		String cacheKey = getCacheKey( wb, fontName + ":" + fontSize + ":" + fontColor + ":" + blod );
+		Font font = FONTS.get( cacheKey );
 		if ( font == null ) {
 			font = wb.createFont();
 			if ( !Objects.equals( fontName, "default" ) ) {
@@ -205,18 +211,22 @@ public class Style {
 			if ( blod ) {
 				font.setBold( blod );
 			}
-			fonts.put( cacheKey, font );
+			FONTS.put( cacheKey, font );
 		}
 		return font;
 	}
 
 	private short getColorIndex( String hexColor ) {
-		if ( colors.size() >= colorSize ) {
-			log.warn( "Custom color value is out of range, only {} color values are allowed", colorSize );
+		if ( COLORS.size() >= COLOR_SIZE ) {
+			LOG.warn( "Custom color value is out of range, only {} color values are allowed", COLOR_SIZE );
+			return IndexedColors.AUTOMATIC.getIndex();
+		}
+		if ( StringUtils.isEmpty( hexColor ) ) {
 			return IndexedColors.AUTOMATIC.getIndex();
 		}
 
-		Short colorIndex = colors.get( hexColor );
+		String cacheKey = getCacheKey( wb, hexColor );
+		Short colorIndex = COLORS.get( cacheKey );
 		if ( colorIndex == null ) {
 			int count = 0;
 			short index = -1;
@@ -225,15 +235,15 @@ public class Style {
 					index = IndexedColors.AUTOMATIC.getIndex();
 					break;
 				}
-				index = ( short ) ThreadLocalRandom.current().nextInt( colorBegin, colorBound );
-			} while ( colors.containsValue( index ) );
+				index = ( short ) ThreadLocalRandom.current().nextInt( COLOR_BEGIN, COLOR_BOUND );
+			} while ( COLORS.containsValue( index ) );
 			Color color = Color.decode( hexColor );
 			byte r = ( byte ) color.getRed();
 			byte g = ( byte ) color.getGreen();
 			byte b = ( byte ) color.getBlue();
 			HSSFPalette palette = ( ( HSSFWorkbook ) wb ).getCustomPalette();
 			palette.setColorAtIndex( index, r, g, b );
-			colors.put( hexColor, colorIndex = index );
+			COLORS.put( cacheKey , colorIndex = index );
 		}
 		return colorIndex;
 	}

@@ -51,8 +51,7 @@ import com.viiyue.plugins.excel.metadata.Style;
  * Excel <code>poi</code> writer, used to write data list into excel table.
  * 
  * @author tangxbai
- * @email tangxbai@hotmail.com
- * @since 2021/05/28
+ * @since 1.0.0
  */
 public final class ExcelWriter<T> extends ExcelProvider<ExcelWriter<T>, T> {
 

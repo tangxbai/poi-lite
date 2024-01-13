@@ -17,8 +17,7 @@ package com.viiyue.plugins.excel.converter;
 
 /**
  * @author tangxbai
- * @email tangxbai@hotmail.com
- * @since 2021/05/28
+ * @since 1.0.0
  */
 public interface WriteConverter {
 	Object convert( Object value );

@@ -24,8 +24,7 @@ import com.viiyue.plugins.excel.metadata.Style;
  * beautify the cell style.
  * 
  * @author tangxbai
- * @email tangxbai@hotmail.com
- * @since 2021/05/28
+ * @since 1.0.0
  */
 public interface Styleable<T> {
 

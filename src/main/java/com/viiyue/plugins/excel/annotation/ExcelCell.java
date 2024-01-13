@@ -28,8 +28,7 @@ import com.viiyue.plugins.excel.converter.WriteConverter;
 
 /**
  * @author tangxbai
- * @email tangxbai@hotmail.com
- * @since 2021/05/28
+ * @since 1.0.0
  */
 @Documented
 @Target( { ElementType.FIELD, ElementType.METHOD } )

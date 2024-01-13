@@ -43,8 +43,7 @@ import com.viiyue.plugins.excel.metadata.ExcelInfo;
  * Excel <code>poi</code> reader
  * 
  * @author tangxbai
- * @email tangxbai@hotmail.com
- * @since 2021/05/28
+ * @since 1.0.0
  */
 public final class ExcelReader<T> extends ExcelProvider<ExcelReader<T>, T> {
 

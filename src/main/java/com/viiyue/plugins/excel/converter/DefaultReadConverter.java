@@ -31,8 +31,7 @@ import com.viiyue.plugins.excel.metadata.CellInfo;
 
 /**
  * @author tangxbai
- * @email tangxbai@hotmail.com
- * @since 2021/05/28
+ * @since 1.0.0
  */
 public class DefaultReadConverter extends AbstractConverter implements ReadConverter {
 

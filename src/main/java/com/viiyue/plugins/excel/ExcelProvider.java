@@ -25,8 +25,7 @@ import com.viiyue.plugins.excel.metadata.MetadataParser;
  * Excel abstract provider
  * 
  * @author tangxbai
- * @email tangxbai@hotmail.com
- * @since 2021/06/01
+ * @since 1.0.0
  */
 abstract class ExcelProvider<K extends ExcelProvider<?, ?>, T> {
 
